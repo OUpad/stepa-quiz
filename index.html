@@ -74,70 +74,72 @@
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+    window.onload = function () {
+      function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
       }
-      return array;
-    }
 
-    function capitalize(text) {
-      return text.charAt(0).toUpperCase() + text.slice(1);
-    }
+      function capitalize(text) {
+        return text.charAt(0).toUpperCase() + text.slice(1);
+      }
 
-    const questions = [...] // trimmed for brevity
+      const questions = [...]; // trimmed to focus on core logic
 
-    const form = document.getElementById('quiz-form');
+      const form = document.getElementById('quiz-form');
 
-    questions.forEach((q, index) => {
-      const div = document.createElement('div');
-      div.className = 'question';
-      const label = document.createElement('label');
-      label.innerHTML = `<strong>${index + 1}. ${q.q}</strong>`;
-      div.appendChild(label);
+      questions.forEach((q, index) => {
+        const div = document.createElement('div');
+        div.className = 'question';
+        const label = document.createElement('label');
+        label.innerHTML = `<strong>${index + 1}. ${q.q}</strong>`;
+        div.appendChild(label);
 
-      const shuffled = shuffle([...q.options]);
-      shuffled.forEach(opt => {
-        const value = capitalize(opt);
-        const id = `q${index}_${value}`;
-        const radio = `<label><input type="radio" name="q${index}" value="${value}" required> ${value}</label>`;
-        div.innerHTML += radio;
+        const shuffled = shuffle([...q.options]);
+        shuffled.forEach(opt => {
+          const value = capitalize(opt);
+          const id = `q${index}_${value}`;
+          const radio = `<label><input type="radio" name="q${index}" value="${value}" required> ${value}</label>`;
+          div.innerHTML += radio;
+        });
+
+        form.appendChild(div);
       });
 
-      form.appendChild(div);
-    });
+      const button = document.createElement('button');
+      button.className = 'submit-btn';
+      button.type = 'submit';
+      button.textContent = 'Отправить ответы';
+      form.appendChild(button);
 
-    const button = document.createElement('button');
-    button.className = 'submit-btn';
-    button.type = 'submit';
-    button.textContent = 'Отправить ответы';
-    form.appendChild(button);
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const data = new FormData(form);
+        const username = data.get('username');
+        let correct = 0;
+        questions.forEach((q, i) => {
+          if (data.get(`q${i}`) === capitalize(q.a)) correct++;
+        });
 
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const data = new FormData(form);
-      const username = data.get('username');
-      let correct = 0;
-      questions.forEach((q, i) => {
-        if (data.get(`q${i}`) === capitalize(q.a)) correct++;
+        await fetch('https://script.google.com/macros/s/AKfycbyHg302lzgrovDJEmdXCMpIF6EAJsuhzWyLLen4NT9776gRheTQNei5Ei-RTmq1ld12vw/exec', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: username, score: correct })
+        });
+
+        form.style.display = 'none';
+        document.getElementById('final-screen').style.display = 'block';
+        document.getElementById('final-result').textContent = `${username}, вы ответили правильно на ${questions.length} вопросов!`;
+        confetti({
+          particleCount: 300,
+          spread: 120,
+          origin: { y: 0.6 }
+        });
       });
-
-      await fetch('https://script.google.com/macros/s/AKfycbyHg302lzgrovDJEmdXCMpIF6EAJsuhzWyLLen4NT9776gRheTQNei5Ei-RTmq1ld12vw/exec', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: username, score: correct })
-      });
-
-      form.style.display = 'none';
-      document.getElementById('final-screen').style.display = 'block';
-      document.getElementById('final-result').textContent = `${username}, вы ответили правильно на ${correct} из ${questions.length} вопросов!`;
-      confetti({
-        particleCount: 300,
-        spread: 120,
-        origin: { y: 0.6 }
-      });
-    });
+    };
   </script>
 </body>
 </html>
