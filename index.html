@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
@@ -140,7 +141,7 @@
           if (data.get(`q${i}`) === capitalize(q.a)) correct++;
         });
 
-        await fetch('https://script.google.com/macros/s/AKfycbyHg302lzgrovDJEmdXCMpIF6EAJsuhzWyLLen4NT9776gRheTQNei5Ei-RTmq1ld12vw/exec', {
+        await fetch('https://script.google.com/macros/s/AKfycbwJoeeVDmslv2oxO53_NHOv9rLYeOxfJCbDyZRkECrAEpxxlJqxlko-rigsYQ4bC6GfOg/exec', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: username, score: correct })
